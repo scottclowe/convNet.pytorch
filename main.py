@@ -269,14 +269,19 @@ def main():
             'best_prec1': best_prec1
         }, is_best, path=save_path)
 
-        logging.info('\nResults - Epoch: {0}\n'
-                     'Training Loss {train[loss]:.4f} \t'
-                     'Training Prec@1 {train[prec1]:.3f} \t'
-                     'Training Prec@5 {train[prec5]:.3f} \t'
-                     'Validation Loss {val[loss]:.4f} \t'
-                     'Validation Prec@1 {val[prec1]:.3f} \t'
-                     'Validation Prec@5 {val[prec5]:.3f} \t\n'
-                     .format(epoch + 1, train=train_results, val=val_results))
+        logging.info(
+            '\nResults - Epoch: {0:3d}/{1:3d}\n'
+            'Training Loss {train[loss]:.4f}   '
+            'Training Prec@1 {train[prec1]:.3f}   '
+            'Training Prec@5 {train[prec5]:.3f}   '
+            'Validation Loss {val[loss]:.4f}   '
+            'Validation Prec@1 {val[prec1]:.3f}   '
+            'Validation Prec@5 {val[prec5]:.3f}\n'
+            .format(
+                epoch + 1, args.epochs,
+                train=train_results, val=val_results
+            )
+        )
 
         values = dict(epoch=epoch + 1, steps=trainer.training_steps)
         values.update({'training ' + k: v for k, v in train_results.items()})
