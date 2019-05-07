@@ -204,7 +204,7 @@ class Trainer(object):
                     'Prec@1 {meters[prec1].val:7.3f} ({meters[prec1].avg:7.3f})   '
                     'Prec@5 {meters[prec5].val:7.3f} ({meters[prec5].avg:7.3f})   '
                     .format(
-                        self.epoch, i, len(data_loader),
+                        self.epoch + 1, i, len(data_loader),
                         phase='TRAINING  ' if training else 'EVALUATING',
                         meters=meters
                     )
