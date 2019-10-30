@@ -264,11 +264,11 @@ def main():
                                       duplicates=train_data.get('duplicates'),
                                       chunk_batch=args.chunk_batch)
 
-        # evaluate on validation set
-        val_results = trainer.validate(val_data.get_loader())
-
         if args.distributed and args.local_rank > 0:
             continue
+
+        # evaluate on validation set
+        val_results = trainer.validate(val_data.get_loader())
 
         # remember best prec@1 and save checkpoint
         is_best = val_results['prec1'] > best_prec1
