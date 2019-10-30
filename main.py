@@ -103,6 +103,10 @@ parser.add_argument('-e', '--evaluate', type=str, metavar='FILE',
                     help='evaluate model FILE on validation set')
 parser.add_argument('--seed', default=123, type=int,
                     help='random seed (default: 123)')
+parser.add_argument('--subsplit-str', default='', type=str,
+                    help=
+                        'subsplitting string (default: none).'
+                        'If given, train and val partitions are subsets of the training set.')
 
 
 def main():
@@ -218,10 +222,18 @@ def main():
                       distributed=args.distributed, local_rank=args.local_rank, mixup=args.mixup, loss_scale=args.loss_scale,
                       grad_clip=args.grad_clip, print_freq=args.print_freq, adapt_grad_norm=args.adapt_grad_norm)
 
+    if not subsplit_str:
+        train_split_str = 'train'
+        val_split_str = 'val'
+    else:
+        train_split_str = 'train_' + args.subsplit_str
+        ploc = args.subsplit_str.index('l')
+        val_split_str = 'train_' + args.subsplit_str[:ploc] + 'r' + args.subsplit_str[ploc:]
+
     # Evaluation Data loading code
     args.eval_batch_size = args.eval_batch_size if args.eval_batch_size > 0 else args.batch_size
     val_data = DataRegime(getattr(model, 'data_eval_regime', None),
-                          defaults={'datasets_path': args.datasets_dir, 'name': args.dataset, 'split': 'val', 'augment': False,
+                          defaults={'datasets_path': args.datasets_dir, 'name': args.dataset, 'split': val_split_str, 'augment': False,
                                     'input_size': args.input_size, 'batch_size': args.eval_batch_size, 'shuffle': False,
                                     'num_workers': args.workers, 'pin_memory': True, 'drop_last': False})
 
@@ -232,7 +244,7 @@ def main():
 
     # Training Data loading code
     train_data = DataRegime(getattr(model, 'data_regime', None),
-                            defaults={'datasets_path': args.datasets_dir, 'name': args.dataset, 'split': 'train', 'augment': True,
+                            defaults={'datasets_path': args.datasets_dir, 'name': args.dataset, 'split': train_split_str, 'augment': True,
                                       'input_size': args.input_size,  'batch_size': args.batch_size, 'shuffle': True,
                                       'num_workers': args.workers, 'pin_memory': True, 'drop_last': True,
                                       'distributed': args.distributed, 'duplicates': args.duplicates, 'autoaugment': args.autoaugment,

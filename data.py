@@ -1,6 +1,8 @@
 import os
+import numpy as np
 import torch
 import torchvision.datasets as datasets
+import torch.utils.data
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data.sampler import RandomSampler
 from utils.regime import Regime
@@ -11,53 +13,101 @@ warnings.filterwarnings("ignore", "(Possibly )?corrupt EXIF data", UserWarning)
 
 def get_dataset(name, split='train', transform=None,
                 target_transform=None, download=True, datasets_path='~/Datasets'):
-    train = (split == 'train')
+    is_main_pt_train = ('train' in split)
     root = os.path.join(os.path.expanduser(datasets_path), name)
     if name == 'cifar10':
-        return datasets.CIFAR10(root=root,
-                                train=train,
-                                transform=transform,
-                                target_transform=target_transform,
-                                download=download)
+        dataset = datasets.CIFAR10(
+            root=root,
+            train=is_main_pt_train,
+            transform=transform,
+            target_transform=target_transform,
+            download=download,
+        )
     elif name == 'cifar100':
-        return datasets.CIFAR100(root=root,
-                                 train=train,
-                                 transform=transform,
-                                 target_transform=target_transform,
-                                 download=download)
+        dataset = datasets.CIFAR100(
+            root=root,
+            train=is_main_pt_train,
+            transform=transform,
+            target_transform=target_transform,
+            download=download,
+        )
     elif name == 'mnist':
-        return datasets.MNIST(root=root,
-                              train=train,
-                              transform=transform,
-                              target_transform=target_transform,
-                              download=download)
+        dataset = datasets.MNIST(
+            root=root,
+            train=is_main_pt_train,
+            transform=transform,
+            target_transform=target_transform,
+            download=download,
+        )
     elif name == 'stl10':
-        return datasets.STL10(root=root,
-                              split=split,
-                              transform=transform,
-                              target_transform=target_transform,
-                              download=download)
+        dataset = datasets.STL10(
+            root=root,
+            split=('train' if is_main_pt_train else split),
+            transform=transform,
+            target_transform=target_transform,
+            download=download,
+        )
     elif name in ('imagenet', 'imagenette', 'imagewoof'):
         URL_IMAGENETTE = 'https://s3.amazonaws.com/fast-ai-imageclas/imagenette.tgz'
         URL_IMAGEWOOF = 'https://s3.amazonaws.com/fast-ai-imageclas/imagewoof.tgz'
-        if train:
+        if is_main_pt_train:
             root = os.path.join(root, 'train')
         else:
             root = os.path.join(root, 'val')
-        return datasets.ImageFolder(root=root,
-                                    transform=transform,
-                                    target_transform=target_transform)
+        dataset = datasets.ImageFolder(
+            root=root,
+            transform=transform,
+            target_transform=target_transform,
+        )
     elif name == 'imagenet_tar':
-        if train:
+        if is_main_pt_train:
             root = os.path.join(root, 'imagenet_train.tar')
         else:
             root = os.path.join(root, 'imagenet_validation.tar')
-        return IndexedFileDataset(root, extract_target_fn=(
-            lambda fname: fname.split('/')[0]),
+        dataset = IndexedFileDataset(
+            root,
+            extract_target_fn=(lambda fname: fname.split('/')[0]),
             transform=transform,
-            target_transform=target_transform)
+            target_transform=target_transform,
+        )
     else:
         raise ValueError('Unrecognised dataset: {}'.format(name))
+    # Check for subsampling of partition
+    split_parts = split.split('_')
+    if len(split_parts) <= 1:
+        return dataset
+    # Need to subsample the data
+    seed = 0
+    left_side = None
+    ratio = None
+    indices = np.arange(len(dataset))
+    for split_part in split_parts:
+        if split_part in ('train', 'val', 'test', ''):
+            continue
+        if split_part[0] == 's':
+            # Set seed for next shuffle
+            seed = int(split_part[1:])
+            # Shuffle the indices
+            np.random.RandomState(seed).shuffle(indices)
+            continue
+        if split_part[0] == 'l':
+            left_side = True
+        elif split_part[0] == 'r':
+            left_side = False
+        else:
+            raise ValueError('Subsplit specification must begin with s, l, or r')
+        # The rest of the string part specifies the split ratio, either
+        # if left, the fraction of the partition to keep;
+        # if right, (1 - fraction) to keep
+        ratio = float(split_part[1:])
+        # Subsample the indices, taking either the left or right partition
+        n = int(round(ratio * len(dataset)))
+        if left_side:
+            indices = indices[:n]
+        else:
+            indices = indices[n:]
+    # Return the appropriate subset of the data
+    return torch.utils.data.Subset(dataset, indices)
 
 
 _DATA_ARGS = {'name', 'split', 'transform',
