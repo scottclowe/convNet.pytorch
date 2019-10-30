@@ -256,6 +256,9 @@ class ResNet_imagenet(ResNet):
                 {'epoch': 0, 'input_size': 224, 'batch_size': 512 * bs_factor},
             ]
 
+        else:
+            raise ValueError('Unsupported regime: {}'.format(regime))
+
 
 class ResNet_cifar(ResNet):
 

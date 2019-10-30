@@ -246,6 +246,9 @@ class ResNetZI_imagenet(ResNetZI):
                 {'epoch': 0, 'input_size': 224, 'batch_size': 128}
             ]
 
+        else:
+            raise ValueError('Unsupported regime: {}'.format(regime))
+
 
 class ResNetZI_cifar(ResNetZI):
 
