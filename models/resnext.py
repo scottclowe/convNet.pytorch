@@ -50,7 +50,9 @@ def resnext(**config):
         config.setdefault('depth', 44)
         return ResNeXt_cifar(block=BasicBlock, **config)
 
+    else:
+        raise ValueError('Unsupported dataset: {}'.format(dataset))
+
 def resnext_se(**config):
     config['residual_block'] = SEBlock
     return resnext(**config)
-    

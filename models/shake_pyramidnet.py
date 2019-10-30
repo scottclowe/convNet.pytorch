@@ -118,4 +118,7 @@ def shake_pyramidnet(**config):
     elif dataset == 'cifar100':
         config.setdefault('num_classes', 100)
 
+    else:
+        raise ValueError('Unsupported dataset: {}'.format(dataset))
+
     return ShakePyramidNet(**config)

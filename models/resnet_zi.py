@@ -314,6 +314,9 @@ def resnet_zi(**config):
         config.setdefault('depth', 44)
         return ResNetZI_cifar(block=BasicBlock, **config)
 
+    else:
+        raise ValueError('Unsupported dataset: {}'.format(dataset))
+
 
 def resnet_zi_se(**config):
     config['residual_block'] = SEBlock

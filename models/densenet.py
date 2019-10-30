@@ -242,3 +242,6 @@ def densenet(**config):
         N = (depth - 4) // 6
         config['block_config'] = (N, N, N)
         return DenseNet_cifar(**config)
+
+    else:
+        raise ValueError('Unsupported dataset: {}'.format(dataset))
