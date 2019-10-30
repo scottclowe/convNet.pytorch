@@ -147,6 +147,9 @@ def get_transform(transform_name='imagenet', input_size=None, scale_size=None,
             scale_size = scale_size or 32
             transform_fn = scale_crop(input_size=input_size, scale_size=scale_size,
                                       num_crops=num_crops, normalize=normalize)
+    else:
+        raise ValueError('Unrecognised transform_name: {}'.format(transform_name))
+
     if cutout is not None:
         transform_fn.transforms.append(Cutout(**cutout))
     return multi_transform(transform_fn, duplicates)
