@@ -54,6 +54,8 @@ def get_dataset(name, split='train', transform=None,
             lambda fname: fname.split('/')[0]),
             transform=transform,
             target_transform=target_transform)
+    else:
+        raise ValueError('Unrecognised dataset: {}'.format(name))
 
 
 _DATA_ARGS = {'name', 'split', 'transform',
