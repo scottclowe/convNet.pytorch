@@ -107,6 +107,8 @@ parser.add_argument('--subsplit-str', default='', type=str,
                     help=
                         'subsplitting string (default: none).'
                         'If given, train and val partitions are subsets of the training set.')
+parser.add_argument('--augval', action='store_true',
+                    help='also show validation with augmentations')
 
 
 def main():
@@ -242,6 +244,19 @@ def main():
         logging.info(results)
         return
 
+    # Evaluation Data loading code
+    if args.augval:
+        augval_data = DataRegime(
+            getattr(model, 'data_eval_regime', None),
+            defaults={
+                'datasets_path': args.datasets_dir, 'name': args.dataset, 'split': val_split_str, 'augment': True,
+                'input_size': args.input_size, 'batch_size': args.eval_batch_size, 'shuffle': False,
+                'num_workers': args.workers, 'pin_memory': True, 'drop_last': False,
+                'autoaugment': args.autoaugment,
+                'cutout': {'holes': 1, 'length': 16} if args.cutout else None},
+            }
+        )
+
     # Training Data loading code
     train_data = DataRegime(getattr(model, 'data_regime', None),
                             defaults={'datasets_path': args.datasets_dir, 'name': args.dataset, 'split': train_split_str, 'augment': True,
@@ -257,6 +272,8 @@ def main():
         trainer.epoch = epoch
         train_data.set_epoch(epoch)
         val_data.set_epoch(epoch)
+        if args.augval:
+            augval_data.set_epoch(epoch)
         logging.info('\nStarting Epoch: {0}\n'.format(epoch + 1))
 
         # train for one epoch
@@ -269,6 +286,8 @@ def main():
 
         # evaluate on validation set
         val_results = trainer.validate(val_data.get_loader())
+        if args.augval:
+            augval_results = trainer.validate(augval_data.get_loader())
 
         # remember best prec@1 and save checkpoint
         is_best = val_results['prec1'] > best_prec1
@@ -281,33 +300,49 @@ def main():
             'best_prec1': best_prec1
         }, is_best, path=save_path)
 
-        logging.info(
+        logging_format = (
             '\nResults - Epoch: {0:3d}/{1:3d}\n'
             'Training Loss {train[loss]:.4f}   '
             'Training Prec@1 {train[prec1]:.3f}   '
             'Training Prec@5 {train[prec5]:.3f}   '
             'Validation Loss {val[loss]:.4f}   '
             'Validation Prec@1 {val[prec1]:.3f}   '
-            'Validation Prec@5 {val[prec5]:.3f}\n'
+            'Validation Prec@5 {val[prec5]:.3f}'
+        )
+        if args.augval:
+            logging_format += (
+                '   '
+                'AugVal Loss {augval_results[loss]:.4f}   '
+                'AugVal Prec@1 {augval_results[prec1]:.3f}   '
+                'AugVal Prec@5 {augval_results[prec5]:.3f}'
+            )
+        logging_format += '\n'
+
+        logging.info(
+            logging_format
             .format(
                 epoch + 1, args.epochs,
-                train=train_results, val=val_results
+                train=train_results, val=val_results,
             )
         )
 
         values = dict(epoch=epoch + 1, steps=trainer.training_steps)
+        plot_partitions = ['training', 'validation']
         values.update({'training ' + k: v for k, v in train_results.items()})
         values.update({'validation ' + k: v for k, v in val_results.items()})
+        if args.augval:
+            plot_partitions.append('aug val')
+            values.update({'aug val ' + k: v for k, v in augval_results.items()})
         results.add(**values)
 
-        results.plot(x='epoch', y=['training loss', 'validation loss'],
-                     legend=['training', 'validation'],
+        results.plot(x='epoch', y=[k + ' loss' for k in plot_partitions],
+                     legend=plot_partitions,
                      title='Loss', ylabel='loss')
-        results.plot(x='epoch', y=['training error1', 'validation error1'],
-                     legend=['training', 'validation'],
+        results.plot(x='epoch', y=[k + ' error1' for k in plot_partitions],
+                     legend=plot_partitions,
                      title='Error@1', ylabel='error %')
-        results.plot(x='epoch', y=['training error5', 'validation error5'],
-                     legend=['training', 'validation'],
+        results.plot(x='epoch', y=[k + ' error5' for k in plot_partitions],
+                     legend=plot_partitions,
                      title='Error@5', ylabel='error %')
         if 'grad' in train_results.keys():
             results.plot(x='epoch', y=['training grad'],
