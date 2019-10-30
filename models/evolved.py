@@ -253,7 +253,7 @@ def evolved_network(**model_config):
     elif dataset == 'cifar100':
         model_config.setdefault('num_classes', 100)
         network = EvolvedNetworkCIFAR(**model_config)
-    elif 'imagenet' in dataset:
+    elif 'imagenet' in dataset or 'imagewoof' in dataset:
         network = EvolvedNetworkImageNet(**model_config)
     else:
         raise ValueError('Unsupported dataset: {}'.format(dataset))

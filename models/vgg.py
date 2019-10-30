@@ -63,7 +63,7 @@ def vgg(**config):
     depth = config.pop('depth', 16)
     bn = config.pop('bn', True)
 
-    if dataset == 'imagenet':
+    if 'imagenet' in dataset or 'imagewoof' in dataset:
         config.setdefault('num_classes', 1000)
         if depth == 11:
             if bn is False:

@@ -161,5 +161,5 @@ def mobilenet_v2(**config):
     <https://arxiv.org/abs/1801.04381>`_ paper.
     """
     dataset = config.pop('dataset', 'imagenet')
-    assert dataset == 'imagenet'
+    assert 'imagenet' in dataset or 'imagewoof' in dataset
     return MobileNet_v2(**config)

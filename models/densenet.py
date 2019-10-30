@@ -207,7 +207,7 @@ def densenet(**config):
         torch.nn.Conv2d = QConv2d
         torch.nn.BatchNorm2d = RangeBN
 
-    if dataset == 'imagenet':
+    if 'imagenet' in dataset or 'imagewoof' in dataset:
         config.setdefault('num_classes', 1000)
         num = config.pop('num', 169)
         if num == 121:

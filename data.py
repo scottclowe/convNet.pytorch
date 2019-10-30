@@ -37,7 +37,9 @@ def get_dataset(name, split='train', transform=None,
                               transform=transform,
                               target_transform=target_transform,
                               download=download)
-    elif name == 'imagenet':
+    elif name in ('imagenet', 'imagenette', 'imagewoof'):
+        URL_IMAGENETTE = 'https://s3.amazonaws.com/fast-ai-imageclas/imagenette.tgz'
+        URL_IMAGEWOOF = 'https://s3.amazonaws.com/fast-ai-imageclas/imagewoof.tgz'
         if train:
             root = os.path.join(root, 'train')
         else:
