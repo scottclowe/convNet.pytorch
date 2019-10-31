@@ -345,6 +345,9 @@ def main():
         results.plot(x='epoch', y=[k + ' error5' for k in plot_partitions],
                      legend=plot_partitions,
                      title='Error@5', ylabel='error %')
+        results.plot(x='epoch', y=['lr'],
+                     legend=['lr'],
+                     title='Learning Rate', ylabel='Learning rate (end of epoch)')
         if 'grad' in train_results.keys():
             results.plot(x='epoch', y=['training grad'],
                          legend=['gradient L2 norm'],
