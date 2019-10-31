@@ -200,7 +200,7 @@ class Trainer(object):
             if i % self.print_freq == 0:
                 report = str(
                     '{phase} - Epoch {0:3d} [{1:3d}/{2:3d}]   '
-                    'LR {:.3E}   '
+                    'LR {lr:.3E}   '
                     'Time {meters[step].val:.3f} ({meters[step].avg:.3f})   '
                     'Data {meters[data].val:.3f} ({meters[data].avg:.3f})   '
                     'Loss {meters[loss].val:.4f} ({meters[loss].avg:.4f})   '
@@ -208,7 +208,7 @@ class Trainer(object):
                     'Prec@5 {meters[prec5].val:7.3f} ({meters[prec5].avg:7.3f})   '
                     .format(
                         self.epoch + 1, i, len(data_loader),
-                        current_lr,
+                        lr=current_lr,
                         phase='TRAINING  ' if training else 'EVALUATING',
                         meters=meters
                     )
