@@ -230,7 +230,7 @@ def main():
     else:
         train_split_str = 'train_' + args.subsplit_str
         ploc = args.subsplit_str.index('l')
-        val_split_str = 'train_' + args.subsplit_str[:ploc] + 'r' + args.subsplit_str[ploc:]
+        val_split_str = 'train_' + args.subsplit_str[:ploc] + 'r' + args.subsplit_str[(ploc+1):]
 
     # Evaluation Data loading code
     args.eval_batch_size = args.eval_batch_size if args.eval_batch_size > 0 else args.batch_size
