@@ -224,7 +224,7 @@ def main():
                       distributed=args.distributed, local_rank=args.local_rank, mixup=args.mixup, loss_scale=args.loss_scale,
                       grad_clip=args.grad_clip, print_freq=args.print_freq, adapt_grad_norm=args.adapt_grad_norm)
 
-    if not subsplit_str:
+    if not args.subsplit_str:
         train_split_str = 'train'
         val_split_str = 'val'
     else:
