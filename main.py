@@ -323,6 +323,7 @@ def main():
             .format(
                 epoch + 1, args.epochs,
                 train=train_results, val=val_results,
+                augval_results=augval_results if args.augval else None,
             )
         )
 
