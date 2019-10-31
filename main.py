@@ -327,6 +327,7 @@ def main():
         )
 
         values = dict(epoch=epoch + 1, steps=trainer.training_steps)
+        values.update({'lr': trainer.optimizer.optimizer.param_groups[0]['lr']}
         plot_partitions = ['training', 'validation']
         values.update({'training ' + k: v for k, v in train_results.items()})
         values.update({'validation ' + k: v for k, v in val_results.items()})
