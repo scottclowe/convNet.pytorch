@@ -302,22 +302,21 @@ def main():
 
         logging_format = (
             '\nResults - Epoch: {0:3d}/{1:3d}\n'
-            'Training Loss {train[loss]:.4f}   '
-            'Training Prec@1 {train[prec1]:.3f}   '
-            'Training Prec@5 {train[prec5]:.3f}   '
-            'Validation Loss {val[loss]:.4f}   '
-            'Validation Prec@1 {val[prec1]:.3f}   '
-            'Validation Prec@5 {val[prec5]:.3f}'
+            '  Training Loss   {train[loss]:.4f}   '
+            'Training Prec@1   {train[prec1]:.3f}   '
+            'Training Prec@5   {train[prec5]:.3f}\n'
         )
         if args.augval:
             logging_format += (
-                '   '
-                'AugVal Loss {augval_results[loss]:.4f}   '
-                'AugVal Prec@1 {augval_results[prec1]:.3f}   '
-                'AugVal Prec@5 {augval_results[prec5]:.3f}'
+                '  AugVal Loss     {augval_results[loss]:.4f}   '
+                'AugVal Prec@1     {augval_results[prec1]:.3f}   '
+                'AugVal Prec@5     {augval_results[prec5]:.3f}\n'
             )
-        logging_format += '\n'
-
+        logging_format += (
+            '  Validation Loss {val[loss]:.4f}   '
+            'Validation Prec@1 {val[prec1]:.3f}   '
+            'Validation Prec@5 {val[prec5]:.3f}\n'
+        )
         logging.info(
             logging_format
             .format(
