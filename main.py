@@ -253,8 +253,8 @@ def main():
                 'input_size': args.input_size, 'batch_size': args.eval_batch_size, 'shuffle': False,
                 'num_workers': args.workers, 'pin_memory': True, 'drop_last': False,
                 'autoaugment': args.autoaugment,
-                'cutout': {'holes': 1, 'length': 16} if args.cutout else None},
-            }
+                'cutout': {'holes': 1, 'length': 16} if args.cutout else None,
+            },
         )
 
     # Training Data loading code
