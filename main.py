@@ -35,6 +35,7 @@ def main(
         model_config='',
         dtype='float',
         device='cuda',
+        device_ids=(0),
         world_size=-1,
         local_rank=-1,
         dist_init='env://',
