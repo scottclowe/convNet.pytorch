@@ -64,7 +64,6 @@ def main(
         augval=False,
     ):
 
-    global best_prec1, dtype
     best_prec1 = 0
     dtype_str = dtype
     dtype = torch_dtypes.get(dtype_str)
