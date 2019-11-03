@@ -114,12 +114,15 @@ def main(
 
     # create model
     model = models.__dict__[model]
-    _model_config = {'dataset': dataset}
+    model_config_arg = model_config
+    model_config = {'dataset': dataset}
 
-    if model_config is not '':
-        _model_config = dict(_model_config, **literal_eval(model_config))
+    if model_config_arg == '':
+        model_config_d = {}
+    elif isinstance(model_config_arg, str):
+        model_config_d = literal_eval(model_config_arg)
+    model_config = dict(model_config, **model_config_d)
 
-    model_config = _model_config
     model = model(**model_config)
     logging.info("created model with configuration: %s", model_config)
     num_parameters = sum([l.nelement() for l in model.parameters()])
