@@ -39,6 +39,7 @@ def main(
         world_size=-1,
         local_rank=-1,
         dist_init='env://',
+        dist_backend='nccl',
         workers=8,
         epochs=90,
         start_epoch=-1,
