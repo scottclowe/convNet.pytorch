@@ -102,7 +102,7 @@ def main(
         results_path, title='Training Results - %s' % save)
 
     logging.info("saving to %s", save_path)
-    logging.debug("run arguments: %s", args)
+    # logging.debug("run arguments: %s", args)
     logging.info("creating model %s", model)
 
     if 'cuda' in device and torch.cuda.is_available():
