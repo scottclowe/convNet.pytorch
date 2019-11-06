@@ -109,6 +109,7 @@ def main(
         torch.cuda.manual_seed_all(seed)
         torch.cuda.set_device(device_ids[0])
         cudnn.benchmark = True
+        cudnn.deterministic = True
     else:
         device_ids = None
 
