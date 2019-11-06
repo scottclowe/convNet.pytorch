@@ -109,7 +109,10 @@ def shake_pyramidnet(**config):
         if bn_norm == 'TopK':
             torch.nn.BatchNorm2d = TopkBatchNorm2d
 
-    if 'imagenet' in dataset or 'imagewoof' in dataset:
+    if 'imagenette' in dataset or 'imagewoof' in dataset:
+        config.setdefault('num_classes', 10)
+
+    elif 'imagenet':
         config.setdefault('num_classes', 1000)
 
     elif dataset == 'cifar10':

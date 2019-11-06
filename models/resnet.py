@@ -320,7 +320,10 @@ def resnet(**config):
             torch.nn.BatchNorm2d = TopkBatchNorm2d
 
     if 'imagenet' in dataset or 'imagewoof' in dataset:
-        config.setdefault('num_classes', 1000)
+        if 'imagenette' in dataset or 'imagewoof' in dataset:
+            config.setdefault('num_classes', 10)
+        else:
+            config.setdefault('num_classes', 1000)
         depth = config.pop('depth', 50)
         if depth == 18:
             config.update(dict(block=BasicBlock,
